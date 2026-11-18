@@ -4,8 +4,8 @@ Player web vertical 9:16 com chuva sobre a cidade à noite. Abra a URL do site, 
 
 ## Publicação na Vercel
 
-Importe este repositório pela opção **Add New → Project**, com `main` como branch de produção e a raiz do repositório como **Root Directory**. O `vercel.json` configura a publicação estática. A rota inicial serve `index.html` e carrega `chuva.mp4` do próprio site.
+Importe este repositório pela opção **Add New → Project**, com `main` como branch de produção e a raiz do repositório como **Root Directory**. O `vercel.json` configura a publicação estática. A rota inicial serve `index.html` e carrega `chuva-suave.mp4` do próprio site.
 
 O clipe padrão acompanha o site. **Trocar vídeo** abre um arquivo local para a sessão atual. Se for necessário salvar envios de forma permanente, use Supabase Storage nessa etapa.
 
-O player usa o áudio do próprio clipe e repete o vídeo automaticamente. O corte entre o fim e o início do clipe de cerca de oito segundos pode aparecer.
+O player usa o áudio do próprio clipe e repete o vídeo automaticamente. O arquivo padrão tem cerca de 31 segundos, com transições graduais entre o fim e o início da cena.
