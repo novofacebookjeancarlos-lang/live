@@ -21,7 +21,8 @@
 </head>
 <body>
   <main>
-    <video src="chuva-suave.mp4" loop playsinline preload="auto" aria-label="Chuva sobre a cidade à noite"></video>
+    <video src="chuva-suave.mp4" muted loop playsinline preload="auto" aria-label="Chuva sobre a cidade à noite"></video>
+    <audio src="chuva-telhado.m4a" loop preload="metadata"></audio>
     <div class="controls">
       <p id="status" role="status" hidden></p>
       <div class="actions">
@@ -35,6 +36,7 @@
   <script>
     const player = document.querySelector('main');
     const video = document.querySelector('video');
+    const audio = document.querySelector('audio');
     const playButton = document.querySelector('#play');
     const picker = document.querySelector('input');
     const status = document.querySelector('#status');
@@ -75,9 +77,11 @@
     async function start() {
       showStatus('');
       try {
-        await video.play();
+        await Promise.all([video.play(), audio.play()]);
       } catch {
-        showStatus(video.error ? 'Não foi possível abrir o vídeo. Selecione um MP4 compatível.' : 'Clique em Iniciar com som para liberar a reprodução.');
+        video.pause();
+        audio.pause();
+        showStatus(audio.error ? 'Não foi possível carregar o som da chuva. Atualize a página.' : video.error ? 'Não foi possível abrir o vídeo. Selecione um MP4 compatível.' : 'Clique em Iniciar com som para liberar a reprodução.');
       }
     }
 
@@ -87,17 +91,25 @@
         player.classList.toggle('playing', playing);
         playButton.textContent = playing ? 'Pausar' : 'Iniciar com som';
         if (playing) keepScreenOn();
-        else if (wakeLock) wakeLock.release().catch(() => {});
+        else {
+          if (video.error) audio.pause();
+          if (wakeLock) wakeLock.release().catch(() => {});
+        }
       });
     }
 
     playButton.addEventListener('click', () => {
       if (!video.paused) {
         video.pause();
+        audio.pause();
       } else {
         playButton.blur();
         start();
       }
+    });
+    audio.addEventListener('error', () => {
+      video.pause();
+      showStatus('Não foi possível carregar o som da chuva. Atualize a página.');
     });
     document.querySelector('#replace').addEventListener('click', () => picker.click());
     picker.addEventListener('change', () => {
