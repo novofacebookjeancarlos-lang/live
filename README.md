@@ -1,17 +1,11 @@
 # Chuva ao Vivo
 
-Player vertical com o vídeo de chuva e o áudio original em repetição.
+Player web vertical 9:16 com chuva sobre a cidade à noite. Abra a URL do site, toque em **Iniciar com som** e, se quiser, use **Tela cheia**. Toque no vídeo ou mova o mouse sobre ele para exibir os controles. O navegador pode manter a tela ligada enquanto a página estiver visível e o vídeo estiver rodando, se o aparelho der suporte a esse recurso.
 
-## Usar no OBS
+## Publicação na Vercel
 
-1. Baixe o projeto em **Code → Download ZIP** e extraia a pasta.
-2. No OBS, ajuste a resolução de base e de saída para **720 × 1280**.
-3. Adicione uma **Fonte de mídia**, selecione `chuva.mp4` como arquivo local e marque **Repetir**. Confira o nível de áudio no mixer.
+Importe este repositório pela opção **Add New → Project**, com `main` como branch de produção e a raiz do repositório como **Root Directory**. O `vercel.json` configura a publicação estática. A rota inicial serve `index.html` e carrega `chuva.mp4` do próprio site.
 
-O mesmo arquivo abre no VLC. Ative a repetição do item atual no controle de loop.
+O clipe padrão acompanha o site. **Trocar vídeo** abre um arquivo local para a sessão atual. Se for necessário salvar envios de forma permanente, use Supabase Storage nessa etapa.
 
-## Usar o player
-
-Abra `index.html` no navegador e clique em **Iniciar com som**. O player também funciona como fonte de navegador local no OBS. Se o áudio aguardar interação, clique em **Interagir** na fonte e inicie o vídeo. Para tocar um arquivo diferente, use **Trocar vídeo**.
-
-O clipe original tem cerca de oito segundos. A volta ao primeiro quadro pode ser perceptível.
+O player usa o áudio do próprio clipe e repete o vídeo automaticamente. O corte entre o fim e o início do clipe de cerca de oito segundos pode aparecer.
