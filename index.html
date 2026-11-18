@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chuva ao Vivo</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #03070e; color: #f1f5f9; font: 15px system-ui, sans-serif; }
+    main { position: relative; width: min(100vw, 56.25dvh); height: 100dvh; margin: auto; }
+    video { display: block; width: 100%; height: 100%; object-fit: contain; }
+    .controls { position: absolute; z-index: 1; inset: auto 0 0; padding: 60px 16px 18px; background: linear-gradient(transparent, #03070ee8); }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    button { background: #101e30; color: inherit; border: 1px solid #526781; border-radius: 8px; padding: 9px 12px; font: inherit; cursor: pointer; }
+    #play { background: #e0efff; color: #071527; }
+    #status { margin: 0 0 10px; }
+    .playing .controls { opacity: 0; transition: opacity .2s; }
+    .playing:hover .controls, .playing:focus-within .controls { opacity: 1; }
+    .clean.playing .controls { display: none; }
+    @media (hover: none) { .playing:not(.clean) .controls { opacity: 1; } }
+  </style>
+</head>
+<body>
+  <main>
+    <video src="chuva.mp4" loop playsinline preload="auto" aria-label="Chuva sobre a cidade à noite"></video>
+    <div class="controls">
+      <p id="status" role="status" hidden></p>
+      <div class="actions">
+        <button id="play">Iniciar com som</button>
+        <button id="replace">Trocar vídeo</button>
+        <button id="fullscreen">Tela cheia</button>
+        <input type="file" accept="video/*" hidden>
+      </div>
+    </div>
+  </main>
+  <script>
+    const player = document.querySelector('main');
+    const video = document.querySelector('video');
+    const playButton = document.querySelector('#play');
+    const picker = document.querySelector('input');
+    const status = document.querySelector('#status');
+    let localVideo;
+
+    function showStatus(message) {
+      status.textContent = message;
+      status.hidden = !message;
+    }
+
+    async function start() {
+      showStatus('');
+      try {
+        await video.play();
+      } catch {
+        showStatus(video.error ? 'Não foi possível abrir o vídeo. Selecione um MP4 compatível.' : 'Clique em Iniciar com som para liberar a reprodução.');
+      }
+    }
+
+    for (const event of ['playing', 'pause', 'error']) {
+      video.addEventListener(event, () => {
+        const playing = !video.paused && !video.error;
+        player.classList.toggle('playing', playing);
+        playButton.textContent = playing ? 'Pausar' : 'Iniciar com som';
+      });
+    }
+
+    playButton.addEventListener('click', () => {
+      if (!video.paused) {
+        video.pause();
+      } else {
+        playButton.blur();
+        start();
+      }
+    });
+    document.querySelector('#replace').addEventListener('click', () => picker.click());
+    picker.addEventListener('change', () => {
+      const file = picker.files[0];
+      if (!file) return;
+      if (localVideo) URL.revokeObjectURL(localVideo);
+      localVideo = URL.createObjectURL(file);
+      video.src = localVideo;
+      picker.value = '';
+      start();
+    });
+    document.querySelector('#fullscreen').addEventListener('click', async () => {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else if (player.requestFullscreen) await player.requestFullscreen();
+        else if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
+      } catch {
+        showStatus('Tela cheia indisponível neste navegador.');
+      }
+    });
+
+    if (new URLSearchParams(location.search).has('obs')) {
+      player.classList.add('clean');
+      start();
+    }
+  </script>
+</body>
+</html>
