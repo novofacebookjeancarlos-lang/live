@@ -10,46 +10,19 @@
 <body>
   <main aria-label="Lo-fi de Madrugada">
     <div class="scene">
-      <img src="quarto-lofi.webp" width="1080" height="1920" alt="Uma garota olha para o céu estrelado do Rio de Janeiro em seu quarto, com um gato dormindo ao lado e um celular na mesa.">
-      <svg class="effects" viewBox="0 0 941 1672" aria-hidden="true">
-        <defs>
-          <linearGradient id="lid" x2="0%" y2="100%">
-            <stop stop-color="#834b30"/>
-            <stop offset="1" stop-color="#b16e47"/>
-          </linearGradient>
-          <g id="note" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
-            <ellipse cx="-3" cy="0" rx="4" ry="2.5" fill="currentColor" transform="rotate(-23)"/>
-            <path d="M1-1v-15q3 4 7 5"/>
-          </g>
-        </defs>
-        <g class="blink">
-          <path fill="#a46742" d="M406 651Q408 637 419 637Q427 639 431 649L426 654Q415 653 406 657Z"/>
-          <path fill="url(#lid)" d="M462 651Q467 638 482 639Q496 640 507 654L517 667Q507 672 492 672Q475 671 460 665Z"/>
-          <path fill="none" stroke="#3a211b" stroke-width="2.5" stroke-linecap="round" d="M407 651Q417 656 429 647M462 659Q479 676 508 666L515 662M504 668l5 3M422 652l3 2"/>
-        </g>
-        <g class="stars" fill="#c6ddff">
-          <circle cx="208" cy="184" r="2.4"/>
-          <circle cx="331" cy="104" r="2.5"/>
-          <circle cx="413" cy="219" r="2"/>
-          <circle cx="148" cy="294" r="2.4"/>
-        </g>
-        <g class="music" transform="translate(790 1073)">
-          <ellipse class="phone-glow" rx="18" ry="6" fill="#d0ffff"/>
-          <use class="note" href="#note"/>
-          <use class="note" href="#note"/>
-          <use class="note" href="#note"/>
-        </g>
-      </svg>
+      <video loop playsinline preload="metadata" aria-label="Vídeo da live"></video>
     </div>
     <audio loop preload="metadata" data-track=""></audio>
     <div class="controls">
       <p id="status" role="status" hidden></p>
       <div class="actions">
+        <button id="choose-video" type="button">Escolher vídeo</button>
         <button id="choose" type="button">Escolher música</button>
-        <button id="play" type="button" hidden>Tocar música</button>
+        <button id="play" type="button" hidden>Iniciar</button>
         <button id="fullscreen" type="button">Tela cheia</button>
         <button id="hide" type="button">Ocultar controles</button>
-        <input type="file" accept="audio/*,.mp3,.m4a,.ogg,.wav" hidden>
+        <input id="video-file" type="file" accept="video/*,.mp4,.webm" hidden>
+        <input id="music-file" type="file" accept="audio/*,.mp3,.m4a,.ogg,.wav" hidden>
       </div>
     </div>
   </main>

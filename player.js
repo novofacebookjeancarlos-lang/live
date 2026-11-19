@@ -2,11 +2,14 @@ const player = document.querySelector('main');
 const scene = document.querySelector('.scene');
 const audio = document.querySelector('audio');
 const controls = document.querySelector('.controls');
-const picker = document.querySelector('input');
+const picker = document.querySelector('#music-file');
+const videoPicker = document.querySelector('#video-file');
+const video = document.querySelector('video');
 const choose = document.querySelector('#choose');
 const play = document.querySelector('#play');
 const status = document.querySelector('#status');
 let localTrack;
+let localVideo;
 let wakeLock;
 let requestingLock = false;
 
@@ -34,50 +37,75 @@ function setControlsVisible(visible) {
   if (!visible) keepScreenOn();
 }
 
-async function startMusic() {
+async function startPlayback() {
+  if (!video.src) return;
   showStatus('');
   try {
-    await audio.play();
+    await Promise.all([video.play(), audio.src ? audio.play() : Promise.resolve()]);
   } catch (error) {
-    if (error.name !== 'AbortError') {
-      showStatus('Não foi possível tocar esta faixa. Tente um MP3, M4A ou WAV.');
-    }
+    if (error.name === 'AbortError') return;
+    video.pause();
+    audio.pause();
+    showStatus('Não foi possível iniciar. Tente um vídeo MP4 e uma faixa MP3 ou M4A.');
   }
 }
 
 if (audio.dataset.track) {
   audio.src = audio.dataset.track;
-  play.hidden = false;
+  video.muted = true;
 }
+
+document.querySelector('#choose-video').addEventListener('click', () => videoPicker.click());
+videoPicker.addEventListener('change', () => {
+  const file = videoPicker.files[0];
+  if (!file) return;
+  audio.pause();
+  const previousVideo = localVideo;
+  localVideo = URL.createObjectURL(file);
+  video.src = localVideo;
+  if (previousVideo) URL.revokeObjectURL(previousVideo);
+  play.hidden = false;
+  videoPicker.value = '';
+  showStatus('');
+});
 
 choose.addEventListener('click', () => picker.click());
 picker.addEventListener('change', () => {
   const file = picker.files[0];
   if (!file) return;
+  video.pause();
   const previousTrack = localTrack;
   localTrack = URL.createObjectURL(file);
   audio.src = localTrack;
+  video.muted = true;
   if (previousTrack) URL.revokeObjectURL(previousTrack);
-  play.hidden = false;
   picker.value = '';
-  startMusic();
+  showStatus('');
 });
 
 play.addEventListener('click', () => {
-  if (audio.paused) startMusic();
-  else audio.pause();
+  if (video.paused) startPlayback();
+  else {
+    video.pause();
+    audio.pause();
+  }
 });
 
-function updateAudioState() {
-  play.textContent = audio.paused ? 'Tocar música' : 'Pausar música';
-  scene.classList.toggle('music-paused', Boolean(audio.src) && audio.paused);
-  if (!audio.paused) keepScreenOn();
+for (const event of ['playing', 'pause']) {
+  video.addEventListener(event, () => {
+    play.textContent = video.paused ? 'Iniciar' : 'Pausar';
+    if (!video.paused) keepScreenOn();
+  });
 }
 
-for (const event of ['playing', 'pause', 'error']) {
-  audio.addEventListener(event, updateAudioState);
-}
-updateAudioState();
+video.addEventListener('error', () => {
+  audio.pause();
+  showStatus('Não foi possível abrir o vídeo. Tente um MP4 compatível com o navegador.');
+});
+audio.addEventListener('error', () => {
+  video.pause();
+  showStatus('Não foi possível abrir a faixa. Tente um MP3 ou M4A.');
+});
 
 document.querySelector('#fullscreen').addEventListener('click', async () => {
   try {
@@ -93,6 +121,6 @@ document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && controls.hidden) setControlsVisible(true);
 });
 document.addEventListener('visibilitychange', () => {
-  if (!controls.hidden && audio.paused) return;
+  if (!controls.hidden && video.paused) return;
   keepScreenOn();
 });
